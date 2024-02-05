@@ -1,5 +1,7 @@
 const express = require("express");
 const { chats } = require("./dummyData/data");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const app = express();
 
