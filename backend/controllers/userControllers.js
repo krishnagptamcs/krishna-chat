@@ -74,7 +74,7 @@ const authUser = async (req, res) => {
     }
 
     // After finding the user, compare the hashed password
-    const comparePassword = await bcrypt.compare(password, user.password);
+    const comparePassword = await bcrypt.compare(password);
 
     if (comparePassword) {
       return res.status(200).json({
