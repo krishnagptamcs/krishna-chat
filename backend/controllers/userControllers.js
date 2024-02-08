@@ -75,18 +75,6 @@ const authUser = async (req, res) => {
 
     // After finding the user, compare the hashed password
     const comparePassword = await bcrypt.compare(password, user.password);
-
-    if (comparePassword) {
-      return res.status(200).json({
-        success: true,
-        message: "User authenticated successfully",
-      });
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Password not matched",
-      });
-    }
   } catch (error) {
     // Handle any errors that occur during the process
     console.error("Authentication Error:", error);
