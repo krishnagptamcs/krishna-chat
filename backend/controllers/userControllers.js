@@ -1,4 +1,4 @@
-const asyncHandler = require("express-async-handler");
+
 const User = require("../models/userModel");
 const generateToken = require("../config/generateToken");
 const bcrypt = require("bcrypt");
@@ -134,7 +134,6 @@ const allUser = async (req, res) => {
         users,
       });
     } else {
-
       // if no user found according to query in our database
       res.status(401).json({
         success: false,

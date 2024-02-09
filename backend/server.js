@@ -12,6 +12,7 @@ connectDB();
 
 // Import routers
 const userRoutes = require("./routes/userRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 
 
 app.use(cors());
@@ -19,5 +20,6 @@ app.use(cors());
 app.get("/", (req, res) => res.send("Apka swagat hai "));
 
 app.use("/api/user", userRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.listen(5000, console.log("Server started on PORT 5000"));
