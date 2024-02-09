@@ -3,6 +3,7 @@ const User = require("../models/userModel");
 const generateToken = require("../config/generateToken");
 const bcrypt = require("bcrypt");
 
+// TO REGESTER A USER
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, pic } = req.body;
@@ -60,12 +61,14 @@ const registerUser = async (req, res) => {
   }
 };
 
+// TO LOGIN A USER
 const authUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
 
+    //if user not found with email id
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -76,10 +79,18 @@ const authUser = async (req, res) => {
     // After finding the user, compare the hashed password
     const comparePassword = await bcrypt.compare(password, user.password);
 
+    // if password compare succesfullly , then  create a token and send it back to the client
     if (comparePassword) {
       return res.status(200).json({
         success: true,
         message: "User authenticated successfully",
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+
+        pic: user.pic,
+        isAdmin: user.isAdmin,
+        token: generateToken(user._id),
       });
     } else {
       return res.status(400).json({
@@ -97,4 +108,46 @@ const authUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, authUser };
+// this api is of query which contains in url
+// /api/user/all-user?search=krishna
+
+// FIND USER ACCORDIG TO QUERY
+const allUser = async (req, res) => {
+  try {
+    // this will find the  data from database using search parameter provided by user and send it to frontend , i represent its is irrespective to case sensitive
+    const keyword = req.query.search
+      ? {
+          $or: [
+            { name: { $regex: req.query.search, $options: "i" } },
+            { email: { $regex: req.query.search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    // after getting the keyword , it will show the list of all matching user , except the current login user
+    const users = await User.find(keyword);
+
+    if (users.length > 0) {
+      res.status(200).json({
+        success: true,
+        message: "user found succcesfully ",
+        users,
+      });
+    } else {
+
+      // if no user found according to query in our database
+      res.status(401).json({
+        success: false,
+        message: "User not avliable ",
+      });
+    }
+  } catch (error) {
+    console.log("error in finding the user ", error);
+    res.status(500).json({
+      success: false,
+      message: "internal error  ",
+    });
+  }
+};
+
+module.exports = { registerUser, authUser, allUser };
