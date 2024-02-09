@@ -97,4 +97,41 @@ const authUser = async (req, res) => {
   }
 };
 
+const authUser3 = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid Email",
+      });
+    }
+
+    // After finding the user, compare the hashed password
+    const comparePassword = await bcrypt.compare(password, user.password);
+
+    if (comparePassword) {
+      return res.status(200).json({
+        success: true,
+        message: "User authenticated successfully",
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Password not matched",
+      });
+    }
+  } catch (error) {
+    // Handle any errors that occur during the process
+    console.error("Authentication Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = { registerUser, authUser };
