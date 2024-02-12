@@ -1,6 +1,6 @@
 const User = require("../models/userModel");
 const Chat = require("../models/chatModel");
-const { json } = require("express");
+
 
 // FUNCTION TO ACCESS THE CHAT of USER IF IT IS PRESENT , Or CREATE A NEW CHAT --> ONE ON ONE CHAT <----
 const accessChat = async (req, res) => {
@@ -71,14 +71,13 @@ const accessChat = async (req, res) => {
 };
 
 // FETCH ALL THE CHAT OF THE USER, taking  the user id and finding all the chat , where the user is present inside the users , in the chat model
-
 const fetchChats = async (req, res) => {
   try {
-    Chat.find({ user: { $elemMatch: { $eq: req.user._id } } })
+    Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
       .populate("latestMessage", "-password")
-      .sort({ updateAt: -1 })
+      .sort({ updateAt: -1 }) // showing the latest message 
       .then(async (results) => {
         results = await User.populate(results, {
           path: "latestMessage.sender",
@@ -101,7 +100,7 @@ const createGroupChat = async (req, res) => {
     // check the name and user , should not be empty
     if (!req.body.users || req.body.name) {
       return res.status(400).json({
-        message: "Pls provide allt he fields",
+        message: "Pls provide all  the fields",
       });
     }
 
@@ -115,7 +114,7 @@ const createGroupChat = async (req, res) => {
         .json({ success: false, message: "required more than two users " });
     }
 
-    // since , while creating the groupn chat , the login user is also going to be in a group , by default , suppose if there is 2 member in array , then it going to be an 2 selected member + login user
+    // since , while creating the group chat , the login user is also going to be in a group , by default , suppose if there is 2 member in array , then it going to be an 2 selected member + login user
 
     users.push(req.user);
 
@@ -153,7 +152,6 @@ const createGroupChat = async (req, res) => {
 };
 
 // FUNCTION TO RENAM THE GROUP
-
 const renameGroup = async (req, res) => {
   const { chatId, chatName } = req.body;
 
@@ -178,7 +176,6 @@ const renameGroup = async (req, res) => {
 };
 
 // FUNCTION TO ADD NEW USER IN GROUP
-
 const addToGroup = async (req, res) => {
   const { chatId, userId } = req.body;
 
@@ -205,7 +202,6 @@ const addToGroup = async (req, res) => {
 };
 
 // FUCNTION TO REMOVE USER FROM GROUP
-
 const removeFromGroup = async (req, res) => {
   const { chatId, userId } = req.body;
 
@@ -230,6 +226,8 @@ const removeFromGroup = async (req, res) => {
     res.json(removed);
   }
 };
+
+
 module.exports = {
   accessChat,
   fetchChats,

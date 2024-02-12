@@ -1,21 +1,21 @@
 import React, { useEffect } from "react";
 import axios from "axios";
+import { ChatState } from "../Context/ChatProvider";
+
 
 const ChatsPage = () => {
-  const fetchChats = async () => {
-    // const chatData = await apiConnector(
-    //   "GET",
-    //   "http://localhost:5000/api/chats"
-    // );
-    const chatData = await axios.get("http://localhost:5000/api/chats");
+  const { user } = ChatState(); // using the user state from chatPage context api
 
-    console.log(chatData?.data);
-  };
+  return (
+    <div style={{ width: "100%" }}>
+      {user && <SideDrawer/>  }
 
-  useEffect(() => {
-    fetchChats();
-  }, []);
-  return <div>ChatsPage</div>;
+      <Box>
+        {user && <MyChats />}
+        {user && <ChatBox />}
+      </Box>
+    </div>
+  );
 };
 
 export default ChatsPage;
